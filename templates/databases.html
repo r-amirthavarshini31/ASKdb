@@ -7,33 +7,37 @@
   
   <div class="databases-header-row">
     <div>
-      <h2>DATABASE MANAGER</h2>
-      <p>Upload new SQLite database files, review query analytics, and manage active datasets.</p>
+      <h2>Your Databases</h2>
+      <p>Upload your data files and start asking questions — no coding required.</p>
+    </div>
+    <div class="db-header-badge">
+      <i data-lucide="shield-check"></i>
+      <span>100% Read-Only & Safe</span>
     </div>
   </div>
 
   <!-- ── ANALYTICS WIDGETS ROW ── -->
   <div class="stats-row">
     <div class="stat-card">
-      <div class="stat-icon-wrapper"><i data-lucide="folder"></i></div>
+      <div class="stat-icon-wrapper"><i data-lucide="database"></i></div>
       <div class="stat-content">
-        <span class="stat-label">Total Databases</span>
+        <span class="stat-label">Databases</span>
         <span class="stat-val">{{ db_stats.total }}</span>
       </div>
     </div>
     
     <div class="stat-card">
-      <div class="stat-icon-wrapper"><i data-lucide="terminal"></i></div>
+      <div class="stat-icon-wrapper"><i data-lucide="message-circle"></i></div>
       <div class="stat-content">
-        <span class="stat-label">Total Queries</span>
+        <span class="stat-label">Questions Asked</span>
         <span class="stat-val">{{ db_stats.queries }}</span>
       </div>
     </div>
     
     <div class="stat-card">
-      <div class="stat-icon-wrapper"><i data-lucide="award"></i></div>
+      <div class="stat-icon-wrapper"><i data-lucide="star"></i></div>
       <div class="stat-content">
-        <span class="stat-label">Most Queried Database</span>
+        <span class="stat-label">Most Popular</span>
         <span class="stat-val-text" title="{{ db_stats.most_queried }}">{{ db_stats.most_queried }}</span>
       </div>
     </div>
@@ -41,22 +45,22 @@
     <div class="stat-card">
       <div class="stat-icon-wrapper"><i data-lucide="clock"></i></div>
       <div class="stat-content">
-        <span class="stat-label">Recently Opened Database</span>
+        <span class="stat-label">Recently Opened</span>
         <span class="stat-val-text" title="{{ db_stats.recently_opened }}">{{ db_stats.recently_opened }}</span>
       </div>
     </div>
   </div>
 
-  <!-- ── UPLOAD ZONE & QUICK GUIDE SIDE-BY-SIDE ── -->
+  <!-- ── UPLOAD ZONE & GETTING STARTED SIDE-BY-SIDE ── -->
   <div class="upload-guide-row">
     <!-- UPLOAD ZONE (70% width) -->
     <div class="upload-wrapper-saas">
       <div class="upload-zone compact" id="uploadZone">
         <input type="file" class="upload-input" id="uploadInput" accept=".db,.sqlite,.sqlite3">
         <div class="upload-icon-saas"><i data-lucide="upload-cloud"></i></div>
-        <h3>Drag & Drop SQLite database file here</h3>
-        <p>or click to browse local files (.db, .sqlite, .sqlite3 up to 50MB)</p>
-        <span class="file-formats-label">Supported formats: SQLite 3 (.db, .sqlite, .sqlite3)</span>
+        <h3>Add Your Data</h3>
+        <p>Drop your database file here or click to browse — we'll take care of the rest!</p>
+        <span class="file-formats-label">Supported: .db, .sqlite, .sqlite3 files • Max 50MB</span>
       </div>
 
       <div class="upload-progress" id="uploadProgress">
@@ -68,26 +72,43 @@
       </div>
     </div>
 
-    <!-- QUICK GUIDE (30% width) -->
+    <!-- GETTING STARTED WIZARD (30% width) -->
     <div class="quick-guide-card">
-      <h3><i data-lucide="help-circle"></i> Quick Guide</h3>
-      <p>AskDB makes it easy to inspect records, aggregate fields, and search structured details without writing a single line of SQL.</p>
-      <div class="guide-tips">
-        <div class="guide-tip-item">
-          <i data-lucide="shield-check" class="success-icon"></i>
-          <span><strong>100% Read-Only:</strong> Destructive commands are strictly blocked. Your databases are safe.</span>
+      <h3><i data-lucide="rocket"></i> Getting Started</h3>
+      <div class="getting-started-steps">
+        <div class="wizard-step">
+          <span class="step-number">1</span>
+          <div class="step-content">
+            <span class="step-title">Upload</span>
+            <span class="step-desc">Drop your .db file in the zone above</span>
+          </div>
         </div>
-        <div class="guide-tip-item">
-          <i data-lucide="database" class="primary-icon"></i>
-          <span><strong>Schema Mapping:</strong> Columns, tables, and references are automatically parsed.</span>
+        <div class="wizard-step">
+          <span class="step-number">2</span>
+          <div class="step-content">
+            <span class="step-title">Ask</span>
+            <span class="step-desc">Type a question like "Show all customers from New York"</span>
+          </div>
+        </div>
+        <div class="wizard-step">
+          <span class="step-number">3</span>
+          <div class="step-content">
+            <span class="step-title">Get Answers</span>
+            <span class="step-desc">See results instantly in a clean table — no SQL needed</span>
+          </div>
         </div>
       </div>
+      {% if databases %}
+        <a href="{{ url_for('workspace', db_id=databases[0].id) }}" class="wizard-cta">
+          Try Example Questions <i data-lucide="arrow-right"></i>
+        </a>
+      {% endif %}
     </div>
   </div>
 
   <!-- ── MY DATASETS (2-COLUMN GRID OF CARDS) ── -->
   <div class="databases-section">
-    <h3><i data-lucide="database"></i> My Datasets ({{ databases|length }})</h3>
+    <h3><i data-lucide="layers"></i> My Datasets ({{ databases|length }})</h3>
     
     {% if databases %}
       <div class="databases-grid">
@@ -105,6 +126,19 @@
                 <span class="db-date">Uploaded {{ db.uploaded_at.split(' ')[0] }}</span>
               </div>
             </div>
+
+            <!-- Status indicator -->
+            {% if session.get('active_db_id') == db.id %}
+              <div class="db-status-indicator ready">
+                <span class="status-dot-sm"></span>
+                <span>Ready to query</span>
+              </div>
+            {% else %}
+              <div class="db-status-indicator inactive">
+                <span class="status-dot-sm"></span>
+                <span>Click "Set Active" to use</span>
+              </div>
+            {% endif %}
             
             <div class="db-card-stats-grid">
               <div class="stat-item">
@@ -136,22 +170,20 @@
                   <span>Active</span>
                 </button>
               {% else %}
-                <button class="btn-secondary-sm action-btn btn-open-db" data-db-id="{{ db.id }}">
-                  <i data-lucide="folder-open"></i>
-                  <span>Open</span>
+                <button class="btn-secondary-sm action-btn btn-set-active btn-open-db" data-db-id="{{ db.id }}" title="Make this your active database">
+                  <i data-lucide="power"></i>
+                  <span>Set Active</span>
                 </button>
               {% endif %}
-              <a href="{{ url_for('workspace', db_id=db.id) }}" class="btn-primary-sm action-btn">
-                <i data-lucide="terminal"></i>
-                <span>Query</span>
+              <a href="{{ url_for('workspace', db_id=db.id) }}" class="btn-primary-sm action-btn btn-ask-questions" title="Go to workspace and ask questions about this data">
+                <i data-lucide="message-circle"></i>
+                <span>Ask Questions</span>
               </a>
-              <a href="{{ url_for('download_user_db', db_id=db.id) }}" class="btn-secondary-sm action-btn" title="Download SQLite file">
+              <a href="{{ url_for('download_user_db', db_id=db.id) }}" class="btn-secondary-sm action-btn" title="Download a copy of this database file">
                 <i data-lucide="download"></i>
-                <span>Download</span>
               </a>
-              <button class="btn-danger-sm action-btn btn-delete-db" data-db-id="{{ db.id }}" title="Delete database">
+              <button class="btn-danger-sm action-btn btn-delete-db" data-db-id="{{ db.id }}" title="Permanently delete this database and its history">
                 <i data-lucide="trash-2"></i>
-                <span>Delete</span>
               </button>
             </div>
           </div>
@@ -159,9 +191,15 @@
       </div>
     {% else %}
       <div class="databases-empty">
-        <i data-lucide="database-backup"></i>
-        <h4>No datasets found</h4>
-        <p>Upload a database file above to start running natural language queries.</p>
+        <div class="empty-icon-wrapper">
+          <i data-lucide="database"></i>
+        </div>
+        <h4>No data yet!</h4>
+        <p>Upload your first database file above and start exploring your data with simple English questions.</p>
+        <button class="empty-cta" onclick="document.getElementById('uploadZone').click()">
+          <i data-lucide="upload-cloud"></i>
+          <span>Upload Your First Database</span>
+        </button>
       </div>
     {% endif %}
   </div>
