@@ -120,3 +120,9 @@ For convenience, a representative e-commerce database is pre-loaded inside `data
 
 ## Security & Safe Queries
 AskDB uses an inline AST analyzer to check all translation results. Queries targeting key system functions or using keywords such as `DROP`, `DELETE`, `UPDATE`, `INSERT`, `ALTER`, `REPLACE`, `CREATE`, or executing nested administrative SQLite functions are automatically blocked, protecting your data files from modifications.
+
+---
+
+## Live Demo
+
+https://askdb-ctm3.onrender.com
